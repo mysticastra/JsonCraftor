@@ -57,6 +57,9 @@ json_object *parse_json_object(const char **str);
 json_array *parse_json_array(const char **str);
 json_value *parse_json_value(const char **str);
 json_value *parse_json(const char *str);
+char *json_object_to_string(json_object *obj);
+char *json_array_to_string(json_array *arr);
+char *to_string(json_value *value);
 
 #ifdef JSONCRAFTOR_IMPLEMENTATION
 
@@ -443,6 +446,135 @@ json_value* get_value(json_value *root, const char *key, char *value)
 
     perror("Root is neither an object nor an array");
     return NULL;
+}
+
+char *to_string(json_value *value) {
+    if (value == NULL) {
+        return strdup("null");
+    }
+
+    char *result = NULL;
+
+    switch (value->type) {
+        case JSON_STRING:
+            {
+                // Escape the string properly
+                size_t length = strlen(value->value.string);
+                result = (char *)malloc(length * 2 + 3);  // Escaping for quotes and backslashes
+                size_t j = 0;
+                result[j++] = '"';  // Opening quote
+                for (size_t i = 0; i < length; i++) {
+                    if (value->value.string[i] == '\\' || value->value.string[i] == '"') {
+                        result[j++] = '\\';
+                    }
+                    result[j++] = value->value.string[i];
+                }
+                result[j++] = '"';  // Closing quote
+                result[j] = '\0';
+            }
+            break;
+
+        case JSON_NUMBER:
+            result = (char *)malloc(50);  // Buffer size for number
+            snprintf(result, 50, "%f", value->value.number);
+            break;
+
+        case JSON_BOOLEAN:
+            result = strdup(value->value.boolean ? "true" : "false");
+            break;
+
+        case JSON_NULL:
+            result = strdup("null");
+            break;
+
+        case JSON_OBJECT:
+            result = json_object_to_string(value->value.object);
+            break;
+
+        case JSON_ARRAY:
+            result = json_array_to_string(value->value.array);
+            break;
+
+        default:
+            result = strdup("Unknown type");
+    }
+
+    return result;
+}
+
+char *json_object_to_string(json_object *obj) {
+    if (obj == NULL) {
+        return strdup("{}");
+    }
+
+    size_t buffer_size = 1024;
+    char *result = (char *)malloc(buffer_size);
+    result[0] = '{';
+
+    size_t pos = 1;
+    json_object *current = obj;
+    while (current != NULL) {
+        size_t key_len = strlen(current->key);
+        char *value_str = to_string(current->value);
+        size_t value_len = strlen(value_str);
+        size_t needed_size = pos + key_len + value_len + 4;
+
+        if (needed_size > buffer_size) {
+            buffer_size = needed_size * 2;
+            result = (char *)realloc(result, buffer_size);
+        }
+
+        pos += snprintf(result + pos, buffer_size - pos, "\"%s\":%s", current->key, value_str);
+
+        current = current->next;
+        if (current != NULL) {
+            result[pos++] = ',';
+        }
+
+        free(value_str);
+    }
+
+    result[pos++] = '}';
+    result[pos] = '\0';
+
+    return result;
+}
+
+char *json_array_to_string(json_array *arr) {
+    if (arr == NULL) {
+        return strdup("[]");
+    }
+
+    size_t buffer_size = 1024;
+    char *result = (char *)malloc(buffer_size);
+    result[0] = '[';
+
+    size_t pos = 1;
+    json_array *current = arr;
+    while (current != NULL) {
+        char *value_str = to_string(current->value);
+        size_t value_len = strlen(value_str);
+        size_t needed_size = pos + value_len + 2;
+
+        if (needed_size > buffer_size) {
+            buffer_size = needed_size * 2;
+            result = (char *)realloc(result, buffer_size);
+        }
+
+        pos += snprintf(result + pos, buffer_size - pos, "%s", value_str);
+
+        current = current->next;
+        if (current != NULL) {
+            result[pos++] = ',';
+        }
+
+        free(value_str);
+    }
+
+    result[pos++] = ']';
+    result[pos] = '\0';
+
+    return result;
 }
 
 #endif

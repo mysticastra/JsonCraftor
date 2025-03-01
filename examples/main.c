@@ -18,7 +18,7 @@ int main()
         if (inner_array && inner_array->type == JSON_OBJECT)
         {
             get_value(inner_array, "description", value);
-            printf("Description: %s\n", value);
+            printf("\nDescription: %s\n\n", value);
         }
     }
 
@@ -26,12 +26,16 @@ int main()
     if (object && object->type == JSON_OBJECT)
     {
         get_value(object, "temp", value);
-        printf("Value: %s\n", value);
+        printf("Temperature: %s\n\n", value);
     }
 
     object = get_value(root, "name", value);
-    printf("Value: %s\n", value);
+    printf("Name: %s\n\n", value);
 
     object = get_value(root, "status", value);
-    printf("Value: %s\n", value);
+    printf("Status: %s\n\n", value);
+
+    char *json_str = to_string(root);
+
+    printf("Serialized JSON: %s\n", json_str);
 }
