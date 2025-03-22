@@ -133,7 +133,7 @@ make run
 
 ## Example Output
 
-```json
+```bash
 Person parsed successfully!
 Name: John
 Age: 25
