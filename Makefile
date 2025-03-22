@@ -71,7 +71,7 @@ all: dirs $(EXAMPLE_BIN) $(TEST_BIN)
 	@echo "$(GREEN)Build complete!$(NC)"
 
 # Build example
-$(EXAMPLE_BIN): $(EXAMPLE_SRC) jsonparser.h
+$(EXAMPLE_BIN): $(EXAMPLE_SRC) jsoncraftor.h
 	@echo "$(YELLOW)Building example...$(NC)"
 	@$(CC) $(CFLAGS) $(INCLUDES) -o $@ $<
 	@echo "$(GREEN)Example built successfully!$(NC)"
@@ -79,7 +79,7 @@ $(EXAMPLE_BIN): $(EXAMPLE_SRC) jsonparser.h
 example: dirs $(EXAMPLE_BIN)
 
 # Build tests
-$(TEST_BIN): $(TEST_SRC) jsonparser.h
+$(TEST_BIN): $(TEST_SRC) jsoncraftor.h
 	@echo "$(YELLOW)Building tests...$(NC)"
 	@$(CC) $(CFLAGS) $(INCLUDES) -o $@ $<
 	@echo "$(GREEN)Tests built successfully!$(NC)"
