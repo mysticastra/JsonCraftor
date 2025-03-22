@@ -1,5 +1,5 @@
 # JsonCraftor Makefile
-# Author: Xentixar
+# Author: MysticAstra
 # Version: 1.0.0
 
 # Compiler and flags
